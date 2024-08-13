@@ -1,0 +1,1090 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        #map {
+            width: 1602px;
+            height: 1342px;
+        }
+        </style>
+        <title>SERVICIO DE CATÁLOGO Y MAPEO TERRITORIAL (Servicio de Salud Valparaíso - San Antonio)</title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/Cobertura_rea_de_Estudio_1.js"></script>
+        <script src="data/Cobertura_reas_Verdes_2.js"></script>
+        <script src="data/Cobertura_Agrupaciones_3.js"></script>
+        <script src="data/Cobertura_Bibliotecas_4.js"></script>
+        <script src="data/Cobertura_Establecimientos_de_Salud_5.js"></script>
+        <script src="data/Cobertura_Establecimientos_Educacionales_6.js"></script>
+        <script src="data/Cobertura_Iglesias_7.js"></script>
+        <script src="data/Cobertura_Infraestructura_Deportiva_8.js"></script>
+        <script src="data/Cobertura_Museos_9.js"></script>
+        <script src="data/Cobertura_Programas_10.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[-33.62252497775581,-71.62380960967032],[-33.60482386621529,-71.60267395409939]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var title = new L.Control({'position':'topright'});
+        title.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+        title.update = function () {
+            this._div.innerHTML = '<h2>SERVICIO DE CATÁLOGO Y MAPEO TERRITORIAL (Servicio de Salud Valparaíso - San Antonio)</h2>';
+        };
+        title.addTo(map);
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleMaps_0');
+        map.getPane('pane_GoogleMaps_0').style.zIndex = 400;
+        var layer_GoogleMaps_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleMaps_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_GoogleMaps_0;
+        map.addLayer(layer_GoogleMaps_0);
+        function pop_Cobertura_rea_de_Estudio_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">OBJECTID</th>\
+                        <td>' + (feature.properties['OBJECTID'] !== null ? autolinker.link(feature.properties['OBJECTID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">CUT_REG</th>\
+                        <td>' + (feature.properties['CUT_REG'] !== null ? autolinker.link(feature.properties['CUT_REG'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">CUT_PROV</th>\
+                        <td>' + (feature.properties['CUT_PROV'] !== null ? autolinker.link(feature.properties['CUT_PROV'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">CUT_COM</th>\
+                        <td>' + (feature.properties['CUT_COM'] !== null ? autolinker.link(feature.properties['CUT_COM'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">REGION</th>\
+                        <td>' + (feature.properties['REGION'] !== null ? autolinker.link(feature.properties['REGION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">PROVINCIA</th>\
+                        <td>' + (feature.properties['PROVINCIA'] !== null ? autolinker.link(feature.properties['PROVINCIA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COMUNA</th>\
+                        <td>' + (feature.properties['COMUNA'] !== null ? autolinker.link(feature.properties['COMUNA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['SUPERFICIE'] !== null ? autolinker.link(feature.properties['SUPERFICIE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Leng'] !== null ? autolinker.link(feature.properties['Shape_Leng'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Shape_Area'] !== null ? autolinker.link(feature.properties['Shape_Area'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cobertura_rea_de_Estudio_1_0() {
+            return {
+                pane: 'pane_Cobertura_rea_de_Estudio_1',
+                opacity: 1,
+                color: 'rgba(228,26,28,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cobertura_rea_de_Estudio_1');
+        map.getPane('pane_Cobertura_rea_de_Estudio_1').style.zIndex = 401;
+        map.getPane('pane_Cobertura_rea_de_Estudio_1').style['mix-blend-mode'] = 'normal';
+        var layer_Cobertura_rea_de_Estudio_1 = new L.geoJson(json_Cobertura_rea_de_Estudio_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cobertura_rea_de_Estudio_1',
+            layerName: 'layer_Cobertura_rea_de_Estudio_1',
+            pane: 'pane_Cobertura_rea_de_Estudio_1',
+            onEachFeature: pop_Cobertura_rea_de_Estudio_1,
+            style: style_Cobertura_rea_de_Estudio_1_0,
+        });
+        bounds_group.addLayer(layer_Cobertura_rea_de_Estudio_1);
+        map.addLayer(layer_Cobertura_rea_de_Estudio_1);
+        function pop_Cobertura_reas_Verdes_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">ID</th>\
+                        <td>' + (feature.properties['ID'] !== null ? autolinker.link(feature.properties['ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">REGIÓN</th>\
+                        <td>' + (feature.properties['REGIÓN'] !== null ? autolinker.link(feature.properties['REGIÓN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COMUNA</th>\
+                        <td>' + (feature.properties['COMUNA'] !== null ? autolinker.link(feature.properties['COMUNA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NOMBRE</th>\
+                        <td>' + (feature.properties['NOMBRE'] !== null ? autolinker.link(feature.properties['NOMBRE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">SERVICIO</th>\
+                        <td>' + (feature.properties['SERVICIO'] !== null ? autolinker.link(feature.properties['SERVICIO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TIPO</th>\
+                        <td>' + (feature.properties['TIPO'] !== null ? autolinker.link(feature.properties['TIPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">USO</th>\
+                        <td>' + (feature.properties['USO'] !== null ? autolinker.link(feature.properties['USO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">SUPERFICIE</th>\
+                        <td>' + (feature.properties['SUPERFICIE'] !== null ? autolinker.link(feature.properties['SUPERFICIE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ESTE'] !== null ? autolinker.link(feature.properties['ESTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NORTE'] !== null ? autolinker.link(feature.properties['NORTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cobertura_reas_Verdes_2_0() {
+            return {
+                pane: 'pane_Cobertura_reas_Verdes_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(66,143,79,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cobertura_reas_Verdes_2');
+        map.getPane('pane_Cobertura_reas_Verdes_2').style.zIndex = 402;
+        map.getPane('pane_Cobertura_reas_Verdes_2').style['mix-blend-mode'] = 'normal';
+        var layer_Cobertura_reas_Verdes_2 = new L.geoJson(json_Cobertura_reas_Verdes_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cobertura_reas_Verdes_2',
+            layerName: 'layer_Cobertura_reas_Verdes_2',
+            pane: 'pane_Cobertura_reas_Verdes_2',
+            onEachFeature: pop_Cobertura_reas_Verdes_2,
+            style: style_Cobertura_reas_Verdes_2_0,
+        });
+        bounds_group.addLayer(layer_Cobertura_reas_Verdes_2);
+        map.addLayer(layer_Cobertura_reas_Verdes_2);
+        function pop_Cobertura_Agrupaciones_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">OBJECTID</th>\
+                        <td>' + (feature.properties['OBJECTID'] !== null ? autolinker.link(feature.properties['OBJECTID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">id</th>\
+                        <td>' + (feature.properties['id'] !== null ? autolinker.link(feature.properties['id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fuente</th>\
+                        <td>' + (feature.properties['Fuente'] !== null ? autolinker.link(feature.properties['Fuente'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Instituci</th>\
+                        <td>' + (feature.properties['Instituci'] !== null ? autolinker.link(feature.properties['Instituci'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Dirección</th>\
+                        <td>' + (feature.properties['Dirección'] !== null ? autolinker.link(feature.properties['Dirección'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Comuna</th>\
+                        <td>' + (feature.properties['Comuna'] !== null ? autolinker.link(feature.properties['Comuna'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Encargado'] !== null ? autolinker.link(feature.properties['Encargado'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Correo_ele</th>\
+                        <td>' + (feature.properties['Correo_ele'] !== null ? autolinker.link(feature.properties['Correo_ele'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Teléfono</th>\
+                        <td>' + (feature.properties['Teléfono'] !== null ? autolinker.link(feature.properties['Teléfono'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cobertura_Agrupaciones_3_0() {
+            return {
+                pane: 'pane_Cobertura_Agrupaciones_3',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/Cobertura_Agrupaciones_3.svg',
+            iconSize: [19.00000000000001, 19.00000000000001]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cobertura_Agrupaciones_3');
+        map.getPane('pane_Cobertura_Agrupaciones_3').style.zIndex = 403;
+        map.getPane('pane_Cobertura_Agrupaciones_3').style['mix-blend-mode'] = 'normal';
+        var layer_Cobertura_Agrupaciones_3 = new L.geoJson(json_Cobertura_Agrupaciones_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cobertura_Agrupaciones_3',
+            layerName: 'layer_Cobertura_Agrupaciones_3',
+            pane: 'pane_Cobertura_Agrupaciones_3',
+            onEachFeature: pop_Cobertura_Agrupaciones_3,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Cobertura_Agrupaciones_3_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Cobertura_Agrupaciones_3);
+        map.addLayer(layer_Cobertura_Agrupaciones_3);
+        function pop_Cobertura_Bibliotecas_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">ID</th>\
+                        <td>' + (feature.properties['ID'] !== null ? autolinker.link(feature.properties['ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">REGIÓN</th>\
+                        <td>' + (feature.properties['REGIÓN'] !== null ? autolinker.link(feature.properties['REGIÓN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COMUNA</th>\
+                        <td>' + (feature.properties['COMUNA'] !== null ? autolinker.link(feature.properties['COMUNA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">SERVICIO</th>\
+                        <td>' + (feature.properties['SERVICIO'] !== null ? autolinker.link(feature.properties['SERVICIO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TIPO</th>\
+                        <td>' + (feature.properties['TIPO'] !== null ? autolinker.link(feature.properties['TIPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NOMBRE</th>\
+                        <td>' + (feature.properties['NOMBRE'] !== null ? autolinker.link(feature.properties['NOMBRE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DIRECCION</th>\
+                        <td>' + (feature.properties['DIRECCION'] !== null ? autolinker.link(feature.properties['DIRECCION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NUMERO</th>\
+                        <td>' + (feature.properties['NUMERO'] !== null ? autolinker.link(feature.properties['NUMERO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">FONO</th>\
+                        <td>' + (feature.properties['FONO'] !== null ? autolinker.link(feature.properties['FONO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">CORREO</th>\
+                        <td>' + (feature.properties['CORREO'] !== null ? autolinker.link(feature.properties['CORREO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['POINT_X'] !== null ? autolinker.link(feature.properties['POINT_X'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['POINT_Y'] !== null ? autolinker.link(feature.properties['POINT_Y'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cobertura_Bibliotecas_4_0() {
+            return {
+                pane: 'pane_Cobertura_Bibliotecas_4',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/Cobertura_Bibliotecas_4.svg',
+            iconSize: [19.00000000000001, 19.00000000000001]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cobertura_Bibliotecas_4');
+        map.getPane('pane_Cobertura_Bibliotecas_4').style.zIndex = 404;
+        map.getPane('pane_Cobertura_Bibliotecas_4').style['mix-blend-mode'] = 'normal';
+        var layer_Cobertura_Bibliotecas_4 = new L.geoJson(json_Cobertura_Bibliotecas_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cobertura_Bibliotecas_4',
+            layerName: 'layer_Cobertura_Bibliotecas_4',
+            pane: 'pane_Cobertura_Bibliotecas_4',
+            onEachFeature: pop_Cobertura_Bibliotecas_4,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Cobertura_Bibliotecas_4_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Cobertura_Bibliotecas_4);
+        map.addLayer(layer_Cobertura_Bibliotecas_4);
+        function pop_Cobertura_Establecimientos_de_Salud_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">ID</th>\
+                        <td>' + (feature.properties['ID'] !== null ? autolinker.link(feature.properties['ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">REGION</th>\
+                        <td>' + (feature.properties['REGION'] !== null ? autolinker.link(feature.properties['REGION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COMUNA</th>\
+                        <td>' + (feature.properties['COMUNA'] !== null ? autolinker.link(feature.properties['COMUNA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TIPO</th>\
+                        <td>' + (feature.properties['TIPO'] !== null ? autolinker.link(feature.properties['TIPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NOMBRE</th>\
+                        <td>' + (feature.properties['NOMBRE'] !== null ? autolinker.link(feature.properties['NOMBRE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DIRECCION</th>\
+                        <td>' + (feature.properties['DIRECCION'] !== null ? autolinker.link(feature.properties['DIRECCION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NÚMERO</th>\
+                        <td>' + (feature.properties['NÚMERO'] !== null ? autolinker.link(feature.properties['NÚMERO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">FONO</th>\
+                        <td>' + (feature.properties['FONO'] !== null ? autolinker.link(feature.properties['FONO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">PRESTADOR</th>\
+                        <td>' + (feature.properties['PRESTADOR'] !== null ? autolinker.link(feature.properties['PRESTADOR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COMP</th>\
+                        <td>' + (feature.properties['COMP'] !== null ? autolinker.link(feature.properties['COMP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ESTE'] !== null ? autolinker.link(feature.properties['ESTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NORTE'] !== null ? autolinker.link(feature.properties['NORTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cobertura_Establecimientos_de_Salud_5_0() {
+            return {
+                pane: 'pane_Cobertura_Establecimientos_de_Salud_5',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/Cobertura_Establecimientos_de_Salud_5.svg',
+            iconSize: [19.00000000000001, 19.00000000000001]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cobertura_Establecimientos_de_Salud_5');
+        map.getPane('pane_Cobertura_Establecimientos_de_Salud_5').style.zIndex = 405;
+        map.getPane('pane_Cobertura_Establecimientos_de_Salud_5').style['mix-blend-mode'] = 'normal';
+        var layer_Cobertura_Establecimientos_de_Salud_5 = new L.geoJson(json_Cobertura_Establecimientos_de_Salud_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cobertura_Establecimientos_de_Salud_5',
+            layerName: 'layer_Cobertura_Establecimientos_de_Salud_5',
+            pane: 'pane_Cobertura_Establecimientos_de_Salud_5',
+            onEachFeature: pop_Cobertura_Establecimientos_de_Salud_5,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Cobertura_Establecimientos_de_Salud_5_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Cobertura_Establecimientos_de_Salud_5);
+        map.addLayer(layer_Cobertura_Establecimientos_de_Salud_5);
+        function pop_Cobertura_Establecimientos_Educacionales_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">FID_</th>\
+                        <td>' + (feature.properties['FID_'] !== null ? autolinker.link(feature.properties['FID_'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['AGNO'] !== null ? autolinker.link(feature.properties['AGNO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['RBD'] !== null ? autolinker.link(feature.properties['RBD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['DGV_RBD'] !== null ? autolinker.link(feature.properties['DGV_RBD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NOM_RBD'] !== null ? autolinker.link(feature.properties['NOM_RBD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['TIPO_SOST'] !== null ? autolinker.link(feature.properties['TIPO_SOST'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['COD_REG_RB'] !== null ? autolinker.link(feature.properties['COD_REG_RB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NOM_REG_RB</th>\
+                        <td>' + (feature.properties['NOM_REG_RB'] !== null ? autolinker.link(feature.properties['NOM_REG_RB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['COD_PRO_RB'] !== null ? autolinker.link(feature.properties['COD_PRO_RB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['COD_COM_RB'] !== null ? autolinker.link(feature.properties['COD_COM_RB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NOM_COM_RB</th>\
+                        <td>' + (feature.properties['NOM_COM_RB'] !== null ? autolinker.link(feature.properties['NOM_COM_RB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['COD_DEPROV'] !== null ? autolinker.link(feature.properties['COD_DEPROV'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NOM_DEPROV</th>\
+                        <td>' + (feature.properties['NOM_DEPROV'] !== null ? autolinker.link(feature.properties['NOM_DEPROV'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TIPO_DEPEN</th>\
+                        <td>' + (feature.properties['TIPO_DEPEN'] !== null ? autolinker.link(feature.properties['TIPO_DEPEN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DIRECCION</th>\
+                        <td>' + (feature.properties['DIRECCION'] !== null ? autolinker.link(feature.properties['DIRECCION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NUMERO</th>\
+                        <td>' + (feature.properties['NUMERO'] !== null ? autolinker.link(feature.properties['NUMERO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['REFERENCIA'] !== null ? autolinker.link(feature.properties['REFERENCIA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LATITUD'] !== null ? autolinker.link(feature.properties['LATITUD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LONGITUD'] !== null ? autolinker.link(feature.properties['LONGITUD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAT_PARV'] !== null ? autolinker.link(feature.properties['MAT_PARV'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAT_BAS_RE'] !== null ? autolinker.link(feature.properties['MAT_BAS_RE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAT_BAS_AD'] !== null ? autolinker.link(feature.properties['MAT_BAS_AD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAT_ESP'] !== null ? autolinker.link(feature.properties['MAT_ESP'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAT_MHC_RE'] !== null ? autolinker.link(feature.properties['MAT_MHC_RE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAT_MHC_AD'] !== null ? autolinker.link(feature.properties['MAT_MHC_AD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAT_MTP_RE'] !== null ? autolinker.link(feature.properties['MAT_MTP_RE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAT_MTP_AD'] !== null ? autolinker.link(feature.properties['MAT_MTP_AD'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAT_TOTAL'] !== null ? autolinker.link(feature.properties['MAT_TOTAL'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAT_HOM_TO'] !== null ? autolinker.link(feature.properties['MAT_HOM_TO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAT_MUJ_TO'] !== null ? autolinker.link(feature.properties['MAT_MUJ_TO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['MAT_SI_TOT'] !== null ? autolinker.link(feature.properties['MAT_SI_TOT'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CUR_SIM_TO'] !== null ? autolinker.link(feature.properties['CUR_SIM_TO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['CUR_COMB_T'] !== null ? autolinker.link(feature.properties['CUR_COMB_T'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cobertura_Establecimientos_Educacionales_6_0() {
+            return {
+                pane: 'pane_Cobertura_Establecimientos_Educacionales_6',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/Cobertura_Establecimientos_Educacionales_6.svg',
+            iconSize: [19.00000000000001, 19.00000000000001]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cobertura_Establecimientos_Educacionales_6');
+        map.getPane('pane_Cobertura_Establecimientos_Educacionales_6').style.zIndex = 406;
+        map.getPane('pane_Cobertura_Establecimientos_Educacionales_6').style['mix-blend-mode'] = 'normal';
+        var layer_Cobertura_Establecimientos_Educacionales_6 = new L.geoJson(json_Cobertura_Establecimientos_Educacionales_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cobertura_Establecimientos_Educacionales_6',
+            layerName: 'layer_Cobertura_Establecimientos_Educacionales_6',
+            pane: 'pane_Cobertura_Establecimientos_Educacionales_6',
+            onEachFeature: pop_Cobertura_Establecimientos_Educacionales_6,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Cobertura_Establecimientos_Educacionales_6_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Cobertura_Establecimientos_Educacionales_6);
+        map.addLayer(layer_Cobertura_Establecimientos_Educacionales_6);
+        function pop_Cobertura_Iglesias_7(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">OBJECTID</th>\
+                        <td>' + (feature.properties['OBJECTID'] !== null ? autolinker.link(feature.properties['OBJECTID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ID</th>\
+                        <td>' + (feature.properties['ID'] !== null ? autolinker.link(feature.properties['ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">REGION</th>\
+                        <td>' + (feature.properties['REGION'] !== null ? autolinker.link(feature.properties['REGION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COMUNA</th>\
+                        <td>' + (feature.properties['COMUNA'] !== null ? autolinker.link(feature.properties['COMUNA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NOMBRE</th>\
+                        <td>' + (feature.properties['NOMBRE'] !== null ? autolinker.link(feature.properties['NOMBRE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">SERVICIO</th>\
+                        <td>' + (feature.properties['SERVICIO'] !== null ? autolinker.link(feature.properties['SERVICIO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TIPO</th>\
+                        <td>' + (feature.properties['TIPO'] !== null ? autolinker.link(feature.properties['TIPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DIRECCION</th>\
+                        <td>' + (feature.properties['DIRECCION'] !== null ? autolinker.link(feature.properties['DIRECCION'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NUMERO</th>\
+                        <td>' + (feature.properties['NUMERO'] !== null ? autolinker.link(feature.properties['NUMERO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">FONO</th>\
+                        <td>' + (feature.properties['FONO'] !== null ? autolinker.link(feature.properties['FONO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">CORREO_ELE</th>\
+                        <td>' + (feature.properties['CORREO_ELE'] !== null ? autolinker.link(feature.properties['CORREO_ELE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ESTE'] !== null ? autolinker.link(feature.properties['ESTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NORTE'] !== null ? autolinker.link(feature.properties['NORTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cobertura_Iglesias_7_0() {
+            return {
+                pane: 'pane_Cobertura_Iglesias_7',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/Cobertura_Iglesias_7.svg',
+            iconSize: [19.00000000000001, 19.00000000000001]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cobertura_Iglesias_7');
+        map.getPane('pane_Cobertura_Iglesias_7').style.zIndex = 407;
+        map.getPane('pane_Cobertura_Iglesias_7').style['mix-blend-mode'] = 'normal';
+        var layer_Cobertura_Iglesias_7 = new L.geoJson(json_Cobertura_Iglesias_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cobertura_Iglesias_7',
+            layerName: 'layer_Cobertura_Iglesias_7',
+            pane: 'pane_Cobertura_Iglesias_7',
+            onEachFeature: pop_Cobertura_Iglesias_7,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Cobertura_Iglesias_7_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Cobertura_Iglesias_7);
+        map.addLayer(layer_Cobertura_Iglesias_7);
+        function pop_Cobertura_Infraestructura_Deportiva_8(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">ID</th>\
+                        <td>' + (feature.properties['ID'] !== null ? autolinker.link(feature.properties['ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">REGIÓN</th>\
+                        <td>' + (feature.properties['REGIÓN'] !== null ? autolinker.link(feature.properties['REGIÓN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COMUNA</th>\
+                        <td>' + (feature.properties['COMUNA'] !== null ? autolinker.link(feature.properties['COMUNA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NOMBRE</th>\
+                        <td>' + (feature.properties['NOMBRE'] !== null ? autolinker.link(feature.properties['NOMBRE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">SERVICIO</th>\
+                        <td>' + (feature.properties['SERVICIO'] !== null ? autolinker.link(feature.properties['SERVICIO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TIPO</th>\
+                        <td>' + (feature.properties['TIPO'] !== null ? autolinker.link(feature.properties['TIPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">SECTOR</th>\
+                        <td>' + (feature.properties['SECTOR'] !== null ? autolinker.link(feature.properties['SECTOR'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">ACCESO</th>\
+                        <td>' + (feature.properties['ACCESO'] !== null ? autolinker.link(feature.properties['ACCESO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">FONO</th>\
+                        <td>' + (feature.properties['FONO'] !== null ? autolinker.link(feature.properties['FONO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cobertura_Infraestructura_Deportiva_8_0() {
+            return {
+                pane: 'pane_Cobertura_Infraestructura_Deportiva_8',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/Cobertura_Infraestructura_Deportiva_8.svg',
+            iconSize: [19.00000000000001, 19.00000000000001]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cobertura_Infraestructura_Deportiva_8');
+        map.getPane('pane_Cobertura_Infraestructura_Deportiva_8').style.zIndex = 408;
+        map.getPane('pane_Cobertura_Infraestructura_Deportiva_8').style['mix-blend-mode'] = 'normal';
+        var layer_Cobertura_Infraestructura_Deportiva_8 = new L.geoJson(json_Cobertura_Infraestructura_Deportiva_8, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cobertura_Infraestructura_Deportiva_8',
+            layerName: 'layer_Cobertura_Infraestructura_Deportiva_8',
+            pane: 'pane_Cobertura_Infraestructura_Deportiva_8',
+            onEachFeature: pop_Cobertura_Infraestructura_Deportiva_8,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Cobertura_Infraestructura_Deportiva_8_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Cobertura_Infraestructura_Deportiva_8);
+        map.addLayer(layer_Cobertura_Infraestructura_Deportiva_8);
+        function pop_Cobertura_Museos_9(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">ID</th>\
+                        <td>' + (feature.properties['ID'] !== null ? autolinker.link(feature.properties['ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">REGIÓN</th>\
+                        <td>' + (feature.properties['REGIÓN'] !== null ? autolinker.link(feature.properties['REGIÓN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COMUNA</th>\
+                        <td>' + (feature.properties['COMUNA'] !== null ? autolinker.link(feature.properties['COMUNA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NOMBRE</th>\
+                        <td>' + (feature.properties['NOMBRE'] !== null ? autolinker.link(feature.properties['NOMBRE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">SERVICIO</th>\
+                        <td>' + (feature.properties['SERVICIO'] !== null ? autolinker.link(feature.properties['SERVICIO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TIPO</th>\
+                        <td>' + (feature.properties['TIPO'] !== null ? autolinker.link(feature.properties['TIPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DIRECCIÓN</th>\
+                        <td>' + (feature.properties['DIRECCIÓN'] !== null ? autolinker.link(feature.properties['DIRECCIÓN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NÚMERO</th>\
+                        <td>' + (feature.properties['NÚMERO'] !== null ? autolinker.link(feature.properties['NÚMERO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">INGRESO</th>\
+                        <td>' + (feature.properties['INGRESO'] !== null ? autolinker.link(feature.properties['INGRESO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">WEB</th>\
+                        <td>' + (feature.properties['WEB'] !== null ? autolinker.link(feature.properties['WEB'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">CORREO</th>\
+                        <td>' + (feature.properties['CORREO'] !== null ? autolinker.link(feature.properties['CORREO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TELEFONO</th>\
+                        <td>' + (feature.properties['TELEFONO'] !== null ? autolinker.link(feature.properties['TELEFONO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ESTE'] !== null ? autolinker.link(feature.properties['ESTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NORTE'] !== null ? autolinker.link(feature.properties['NORTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cobertura_Museos_9_0() {
+            return {
+                pane: 'pane_Cobertura_Museos_9',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/Cobertura_Museos_9.svg',
+            iconSize: [19.00000000000001, 19.00000000000001]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cobertura_Museos_9');
+        map.getPane('pane_Cobertura_Museos_9').style.zIndex = 409;
+        map.getPane('pane_Cobertura_Museos_9').style['mix-blend-mode'] = 'normal';
+        var layer_Cobertura_Museos_9 = new L.geoJson(json_Cobertura_Museos_9, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cobertura_Museos_9',
+            layerName: 'layer_Cobertura_Museos_9',
+            pane: 'pane_Cobertura_Museos_9',
+            onEachFeature: pop_Cobertura_Museos_9,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Cobertura_Museos_9_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Cobertura_Museos_9);
+        map.addLayer(layer_Cobertura_Museos_9);
+        function pop_Cobertura_Programas_10(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">ID</th>\
+                        <td>' + (feature.properties['ID'] !== null ? autolinker.link(feature.properties['ID'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">REGIÓN</th>\
+                        <td>' + (feature.properties['REGIÓN'] !== null ? autolinker.link(feature.properties['REGIÓN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">COMUNA</th>\
+                        <td>' + (feature.properties['COMUNA'] !== null ? autolinker.link(feature.properties['COMUNA'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NOMBRE</th>\
+                        <td>' + (feature.properties['NOMBRE'] !== null ? autolinker.link(feature.properties['NOMBRE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">SERVICIO</th>\
+                        <td>' + (feature.properties['SERVICIO'] !== null ? autolinker.link(feature.properties['SERVICIO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TIPO</th>\
+                        <td>' + (feature.properties['TIPO'] !== null ? autolinker.link(feature.properties['TIPO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DIRECCIÓN</th>\
+                        <td>' + (feature.properties['DIRECCIÓN'] !== null ? autolinker.link(feature.properties['DIRECCIÓN'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">NÚMERO</th>\
+                        <td>' + (feature.properties['NÚMERO'] !== null ? autolinker.link(feature.properties['NÚMERO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">CORREO</th>\
+                        <td>' + (feature.properties['CORREO'] !== null ? autolinker.link(feature.properties['CORREO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">TELÉFONO</th>\
+                        <td>' + (feature.properties['TELÉFONO'] !== null ? autolinker.link(feature.properties['TELÉFONO'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ESTE'] !== null ? autolinker.link(feature.properties['ESTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['NORTE'] !== null ? autolinker.link(feature.properties['NORTE'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Cobertura_Programas_10_0() {
+            return {
+                pane: 'pane_Cobertura_Programas_10',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/Cobertura_Programas_10.svg',
+            iconSize: [19.00000000000001, 19.00000000000001]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Cobertura_Programas_10');
+        map.getPane('pane_Cobertura_Programas_10').style.zIndex = 410;
+        map.getPane('pane_Cobertura_Programas_10').style['mix-blend-mode'] = 'normal';
+        var layer_Cobertura_Programas_10 = new L.geoJson(json_Cobertura_Programas_10, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Cobertura_Programas_10',
+            layerName: 'layer_Cobertura_Programas_10',
+            pane: 'pane_Cobertura_Programas_10',
+            onEachFeature: pop_Cobertura_Programas_10,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Cobertura_Programas_10_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Cobertura_Programas_10);
+        map.addLayer(layer_Cobertura_Programas_10);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var baseMaps = {};
+        var overlaysTree = [
+            {label: '<img src="legend/Cobertura_Programas_10.png" /> Cobertura_Programas', layer: layer_Cobertura_Programas_10},
+            {label: '<img src="legend/Cobertura_Museos_9.png" /> Cobertura_Museos', layer: layer_Cobertura_Museos_9},
+            {label: '<img src="legend/Cobertura_Infraestructura_Deportiva_8.png" /> Cobertura_Infraestructura_Deportiva', layer: layer_Cobertura_Infraestructura_Deportiva_8},
+            {label: '<img src="legend/Cobertura_Iglesias_7.png" /> Cobertura_Iglesias', layer: layer_Cobertura_Iglesias_7},
+            {label: '<img src="legend/Cobertura_Establecimientos_Educacionales_6.png" /> Cobertura_Establecimientos_Educacionales', layer: layer_Cobertura_Establecimientos_Educacionales_6},
+            {label: '<img src="legend/Cobertura_Establecimientos_de_Salud_5.png" /> Cobertura_Establecimientos_de_Salud', layer: layer_Cobertura_Establecimientos_de_Salud_5},
+            {label: '<img src="legend/Cobertura_Bibliotecas_4.png" /> Cobertura_Bibliotecas', layer: layer_Cobertura_Bibliotecas_4},
+            {label: '<img src="legend/Cobertura_Agrupaciones_3.png" /> Cobertura_Agrupaciones', layer: layer_Cobertura_Agrupaciones_3},
+            {label: '<img src="legend/Cobertura_reas_Verdes_2.png" /> Cobertura_Áreas_Verdes', layer: layer_Cobertura_reas_Verdes_2},
+            {label: '<img src="legend/Cobertura_rea_de_Estudio_1.png" /> Cobertura_Área_de_Estudio', layer: layer_Cobertura_rea_de_Estudio_1},
+            {label: "Google Maps", layer: layer_GoogleMaps_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: false, 
+        });
+        lay.addTo(map);
+        setBounds();
+        var i = 0;
+        layer_Cobertura_rea_de_Estudio_1.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['COMUNA'] !== null?String('<div style="color: #323232; font-size: 10pt; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['COMUNA']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_Cobertura_rea_de_Estudio_1'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        resetLabels([layer_Cobertura_rea_de_Estudio_1]);
+        map.on("zoomend", function(){
+            resetLabels([layer_Cobertura_rea_de_Estudio_1]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_Cobertura_rea_de_Estudio_1]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_Cobertura_rea_de_Estudio_1]);
+        });
+        </script>
+    </body>
+</html>
